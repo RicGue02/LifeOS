@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TaskListView: View {
+    @EnvironmentObject var dataManager: DataManager
     @StateObject private var viewModel = TaskListViewModel()
     
     var body: some View {
@@ -61,6 +62,9 @@ struct TaskListView: View {
             }
             .sheet(isPresented: $viewModel.showingAddTask) {
                 AddTaskView(viewModel: viewModel)
+            }
+            .onAppear {
+                viewModel.taskStore = dataManager.taskStore
             }
             .overlay {
                 if viewModel.taskStore.tasks.isEmpty {

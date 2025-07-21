@@ -8,11 +8,7 @@
 import SwiftUI
 
 struct HabitsView: View {
-    @State private var habits: [Habit] = [
-        Habit(name: "Drink Water", icon: "drop.fill", color: "blue", targetCount: 8),
-        Habit(name: "Exercise", icon: "figure.run", color: "orange", targetCount: 1),
-        Habit(name: "Read", icon: "book.fill", color: "purple", targetCount: 1)
-    ]
+    @EnvironmentObject var dataManager: DataManager
     @State private var showingAddHabit = false
     
     var body: some View {
@@ -26,9 +22,9 @@ struct HabitsView: View {
                             .fontWeight(.bold)
                             .padding(.horizontal)
                         
-                        ForEach(habits.filter { $0.isActive }) { habit in
+                        ForEach(dataManager.habitStore.activeHabits) { habit in
                             HabitCard(habit: habit) {
-                                toggleHabitCompletion(habit)
+                                dataManager.habitStore.toggleHabitCompletion(habit)
                             }
                             .padding(.horizontal)
                         }
@@ -38,21 +34,21 @@ struct HabitsView: View {
                     HStack(spacing: 16) {
                         StatsSummaryCard(
                             title: "Total Habits",
-                            value: "\(habits.filter { $0.isActive }.count)",
+                            value: "\(dataManager.habitStore.activeHabits.count)",
                             icon: "star.fill",
                             color: .yellow
                         )
                         
                         StatsSummaryCard(
                             title: "Completed Today",
-                            value: "\(habits.filter { $0.isCompletedToday }.count)",
+                            value: "\(dataManager.habitStore.completedToday)",
                             icon: "checkmark.circle.fill",
                             color: .green
                         )
                     }
                     .padding(.horizontal)
                     
-                    if habits.isEmpty {
+                    if dataManager.habitStore.habits.isEmpty {
                         ContentUnavailableView(
                             "No Habits",
                             systemImage: "repeat.circle",
@@ -74,20 +70,9 @@ struct HabitsView: View {
                 }
             }
             .sheet(isPresented: $showingAddHabit) {
-                AddHabitView(habits: $habits)
+                AddHabitView()
+                    .environmentObject(dataManager)
             }
-        }
-    }
-    
-    private func toggleHabitCompletion(_ habit: Habit) {
-        guard let index = habits.firstIndex(where: { $0.id == habit.id }) else { return }
-        
-        if habits[index].isCompletedToday {
-            habits[index].completions.removeAll { completion in
-                Calendar.current.isDateInToday(completion.date)
-            }
-        } else {
-            habits[index].completions.append(HabitCompletion())
         }
     }
 }
@@ -169,7 +154,7 @@ struct StatsSummaryCard: View {
 }
 
 struct AddHabitView: View {
-    @Binding var habits: [Habit]
+    @EnvironmentObject var dataManager: DataManager
     @Environment(\.dismiss) private var dismiss
     
     @State private var name = ""
@@ -261,7 +246,7 @@ struct AddHabitView: View {
                             frequency: frequency,
                             targetCount: targetCount
                         )
-                        habits.append(newHabit)
+                        dataManager.habitStore.addHabit(newHabit)
                         dismiss()
                     }
                     .disabled(name.isEmpty)

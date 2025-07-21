@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject var dataManager: DataManager
     @AppStorage("notificationsEnabled") private var notificationsEnabled = true
     @AppStorage("soundEnabled") private var soundEnabled = true
     @AppStorage("hapticEnabled") private var hapticEnabled = true
     @State private var showingAbout = false
     @State private var showingPrivacy = false
+    @State private var showingNotificationAlert = false
     
     var body: some View {
         NavigationStack {
@@ -38,10 +40,21 @@ struct SettingsView: View {
                 // Notifications
                 Section("Notifications") {
                     Toggle("Enable Notifications", isOn: $notificationsEnabled)
+                        .onChange(of: notificationsEnabled) { _, newValue in
+                            if newValue && !dataManager.notificationManager.isAuthorized {
+                                showingNotificationAlert = true
+                            }
+                        }
                     
                     if notificationsEnabled {
                         Toggle("Sound", isOn: $soundEnabled)
                         Toggle("Haptic Feedback", isOn: $hapticEnabled)
+                        
+                        if !dataManager.notificationManager.isAuthorized {
+                            Label("Notifications disabled in System Settings", systemImage: "exclamationmark.triangle")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
                     }
                 }
                 
@@ -125,6 +138,18 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showingPrivacy) {
                 PrivacyView()
+            }
+            .alert("Enable Notifications", isPresented: $showingNotificationAlert) {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("Cancel", role: .cancel) {
+                    notificationsEnabled = false
+                }
+            } message: {
+                Text("To receive reminders for tasks and habits, please enable notifications in Settings.")
             }
         }
     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DashboardView: View {
-    @StateObject private var taskStore = TaskStore()
+    @EnvironmentObject var dataManager: DataManager
     @State private var currentDate = Date()
     
     private var greeting: String {
@@ -24,20 +24,11 @@ struct DashboardView: View {
     }
     
     private var todaysTasks: [Task] {
-        taskStore.incompleteTasks.filter { task in
-            if let dueDate = task.dueDate {
-                return Calendar.current.isDateInToday(dueDate)
-            }
-            return false
-        }
+        dataManager.todaysTasks
     }
     
     private var upcomingTasks: [Task] {
-        taskStore.incompleteTasks
-            .filter { $0.dueDate != nil }
-            .sorted { ($0.dueDate ?? Date()) < ($1.dueDate ?? Date()) }
-            .prefix(3)
-            .map { $0 }
+        Array(dataManager.upcomingTasks.prefix(3))
     }
     
     var body: some View {
@@ -68,7 +59,7 @@ struct DashboardView: View {
                         
                         StatCard(
                             title: "Completed",
-                            value: "\(taskStore.completedTasks.count)",
+                            value: "\(dataManager.taskStore.completedTasks.count)",
                             icon: "checkmark.circle.fill",
                             color: .green
                         )
@@ -82,7 +73,7 @@ struct DashboardView: View {
                             
                             ForEach(todaysTasks) { task in
                                 TaskCard(task: task) {
-                                    taskStore.toggleTaskCompletion(task)
+                                    dataManager.taskStore.toggleTaskCompletion(task)
                                 }
                             }
                         }
@@ -96,7 +87,7 @@ struct DashboardView: View {
                             
                             ForEach(upcomingTasks) { task in
                                 TaskCard(task: task) {
-                                    taskStore.toggleTaskCompletion(task)
+                                    dataManager.taskStore.toggleTaskCompletion(task)
                                 }
                             }
                         }

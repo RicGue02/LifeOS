@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AddTaskView: View {
     @ObservedObject var viewModel: TaskListViewModel
+    @EnvironmentObject var dataManager: DataManager
     @Environment(\.dismiss) private var dismiss
     
     @State private var title = ""
@@ -16,6 +17,7 @@ struct AddTaskView: View {
     @State private var priority: Task.Priority = .medium
     @State private var hasDueDate = false
     @State private var dueDate = Date()
+    @State private var enableReminder = false
     
     var body: some View {
         NavigationStack {
@@ -42,8 +44,17 @@ struct AddTaskView: View {
                         DatePicker(
                             "Date",
                             selection: $dueDate,
-                            displayedComponents: [.date]
+                            displayedComponents: [.date, .hourAndMinute]
                         )
+                        
+                        Toggle("Reminder", isOn: $enableReminder)
+                            .disabled(!dataManager.notificationManager.isAuthorized)
+                        
+                        if !dataManager.notificationManager.isAuthorized && enableReminder {
+                            Label("Enable notifications in Settings", systemImage: "exclamationmark.triangle")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                        }
                     }
                 }
             }
@@ -58,12 +69,20 @@ struct AddTaskView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        viewModel.addTask(
+                        let newTask = Task(
                             title: title,
                             description: description,
                             priority: priority,
                             dueDate: hasDueDate ? dueDate : nil
                         )
+                        viewModel.taskStore.addTask(newTask)
+                        
+                        if enableReminder && hasDueDate {
+                            Task {
+                                await dataManager.notificationManager.scheduleTaskReminder(for: newTask)
+                            }
+                        }
+                        
                         dismiss()
                     }
                     .disabled(title.isEmpty)

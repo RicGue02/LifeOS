@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct StatsView: View {
-    @StateObject private var taskStore = TaskStore()
+    @EnvironmentObject var dataManager: DataManager
     @State private var selectedPeriod: Period = .week
     
     enum Period: String, CaseIterable {
@@ -32,7 +32,7 @@ struct StatsView: View {
         
         for dayOffset in 0..<days {
             if let date = calendar.date(byAdding: .day, value: -dayOffset, to: Date()) {
-                let completedCount = taskStore.tasks.filter { task in
+                let completedCount = dataManager.taskStore.tasks.filter { task in
                     task.isCompleted && calendar.isDate(task.updatedAt, inSameDayAs: date)
                 }.count
                 
@@ -60,14 +60,14 @@ struct StatsView: View {
                     HStack(spacing: 16) {
                         OverviewCard(
                             title: "Total Tasks",
-                            value: "\(taskStore.tasks.count)",
+                            value: "\(dataManager.taskStore.tasks.count)",
                             icon: "checklist",
                             color: .blue
                         )
                         
                         OverviewCard(
                             title: "Completed",
-                            value: "\(taskStore.completedTasks.count)",
+                            value: "\(dataManager.taskStore.completedTasks.count)",
                             icon: "checkmark.circle.fill",
                             color: .green
                         )
@@ -165,16 +165,16 @@ struct StatsView: View {
     }
     
     private var completionRate: Int {
-        guard !taskStore.tasks.isEmpty else { return 0 }
-        return Int((Double(taskStore.completedTasks.count) / Double(taskStore.tasks.count)) * 100)
+        guard !dataManager.taskStore.tasks.isEmpty else { return 0 }
+        return Int((Double(dataManager.taskStore.completedTasks.count) / Double(dataManager.taskStore.tasks.count)) * 100)
     }
     
     private func taskCount(for priority: Task.Priority) -> Int {
-        taskStore.tasks.filter { $0.priority == priority }.count
+        dataManager.taskStore.tasks.filter { $0.priority == priority }.count
     }
     
     private var recentTasks: [Task] {
-        taskStore.tasks
+        dataManager.taskStore.tasks
             .sorted { $0.updatedAt > $1.updatedAt }
             .prefix(5)
             .map { $0 }
