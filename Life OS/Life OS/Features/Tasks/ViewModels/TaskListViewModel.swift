@@ -15,8 +15,8 @@ class TaskListViewModel: ObservableObject {
     @Published var showingAddTask = false
     @Published var selectedTask: Task?
     
-    init(taskStore: TaskStore = TaskStore()) {
-        self.taskStore = taskStore
+    init(taskStore: TaskStore? = nil) {
+        self.taskStore = taskStore ?? TaskStore()
     }
     
     var filteredIncompleteTasks: [Task] {
