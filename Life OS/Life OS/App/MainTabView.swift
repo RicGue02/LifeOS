@@ -24,23 +24,29 @@ struct MainTabView: View {
                 }
                 .tag(1)
             
+            CharacterView()
+                .tabItem {
+                    Label("Character", systemImage: "person.crop.circle.fill")
+                }
+                .tag(2)
+            
             HabitsView()
                 .tabItem {
                     Label("Habits", systemImage: "repeat.circle.fill")
                 }
-                .tag(2)
+                .tag(3)
             
             StatsView()
                 .tabItem {
                     Label("Stats", systemImage: "chart.line.uptrend.xyaxis")
                 }
-                .tag(3)
+                .tag(4)
             
             SettingsView()
                 .tabItem {
                     Label("Settings", systemImage: "gearshape.fill")
                 }
-                .tag(4)
+                .tag(5)
         }
         .tint(.accentColor)
     }

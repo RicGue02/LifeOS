@@ -19,6 +19,9 @@ struct TaskListView: View {
                         ForEach(viewModel.filteredIncompleteTasks) { task in
                             TaskRowView(task: task) {
                                 viewModel.toggleTaskCompletion(task)
+                                if !task.isCompleted {
+                                    dataManager.characterStore.completeTask(priority: task.priority)
+                                }
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {

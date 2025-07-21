@@ -24,7 +24,11 @@ struct HabitsView: View {
                         
                         ForEach(dataManager.habitStore.activeHabits) { habit in
                             HabitCard(habit: habit) {
+                                let wasCompleted = habit.isCompletedToday
                                 dataManager.habitStore.toggleHabitCompletion(habit)
+                                if !wasCompleted {
+                                    dataManager.characterStore.completeHabit()
+                                }
                             }
                             .padding(.horizontal)
                         }

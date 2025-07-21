@@ -48,21 +48,40 @@ struct DashboardView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     
-                    // Quick Stats
+                    // Character Progress
                     HStack(spacing: 16) {
-                        StatCard(
-                            title: "Tasks Today",
-                            value: "\(todaysTasks.count)",
-                            icon: "checklist",
-                            color: .blue
-                        )
+                        // Mini Hexagon
+                        VStack {
+                            MiniHexagonView(
+                                dimensions: dataManager.characterStore.character.dimensions,
+                                size: 100
+                            )
+                            
+                            Text("Level \(dataManager.characterStore.character.level)")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(12)
                         
-                        StatCard(
-                            title: "Completed",
-                            value: "\(dataManager.taskStore.completedTasks.count)",
-                            icon: "checkmark.circle.fill",
-                            color: .green
-                        )
+                        // Quick Stats
+                        VStack(spacing: 16) {
+                            StatCard(
+                                title: "Tasks Today",
+                                value: "\(todaysTasks.count)",
+                                icon: "checklist",
+                                color: .blue
+                            )
+                            
+                            StatCard(
+                                title: "Completed",
+                                value: "\(dataManager.taskStore.completedTasks.count)",
+                                icon: "checkmark.circle.fill",
+                                color: .green
+                            )
+                        }
                     }
                     .padding(.horizontal)
                     

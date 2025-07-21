@@ -13,16 +13,45 @@ import Combine
 final class DataManager: ObservableObject {
     @Published var taskStore: TaskStore
     @Published var habitStore: HabitStore
+    @Published var characterStore: CharacterStore
     let notificationManager = NotificationManager.shared
     
     init() {
         self.taskStore = TaskStore()
         self.habitStore = HabitStore()
+        self.characterStore = CharacterStore()
         setupNotifications()
+        setupCharacterTracking()
     }
     
     private func setupNotifications() {
         notificationManager.setupNotificationActions()
+    }
+    
+    private func setupCharacterTracking() {
+        // Track task completions
+        taskStore.$tasks
+            .sink { [weak self] _ in
+                self?.updateCharacterFromTasks()
+            }
+            .store(in: &cancellables)
+        
+        // Track habit completions
+        habitStore.$habits
+            .sink { [weak self] _ in
+                self?.updateCharacterFromHabits()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    private func updateCharacterFromTasks() {
+        // This will be called when tasks change
+    }
+    
+    private func updateCharacterFromHabits() {
+        // This will be called when habits change
     }
     
     // Dashboard Statistics
