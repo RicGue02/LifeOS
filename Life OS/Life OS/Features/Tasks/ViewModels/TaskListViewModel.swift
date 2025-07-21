@@ -13,13 +13,13 @@ class TaskListViewModel: ObservableObject {
     @Published var taskStore: TaskStore
     @Published var searchText = ""
     @Published var showingAddTask = false
-    @Published var selectedTask: Task?
+    @Published var selectedTask: TaskItem?
     
     init(taskStore: TaskStore? = nil) {
         self.taskStore = taskStore ?? TaskStore()
     }
     
-    var filteredIncompleteTasks: [Task] {
+    var filteredIncompleteTasks: [TaskItem] {
         if searchText.isEmpty {
             return taskStore.incompleteTasks
         } else {
@@ -30,7 +30,7 @@ class TaskListViewModel: ObservableObject {
         }
     }
     
-    var filteredCompletedTasks: [Task] {
+    var filteredCompletedTasks: [TaskItem] {
         if searchText.isEmpty {
             return taskStore.completedTasks
         } else {
@@ -41,8 +41,8 @@ class TaskListViewModel: ObservableObject {
         }
     }
     
-    func addTask(title: String, description: String, priority: Task.Priority, dueDate: Date?) {
-        let newTask = Task(
+    func addTask(title: String, description: String, priority: TaskItem.Priority, dueDate: Date?) {
+        let newTask = TaskItem(
             title: title,
             description: description,
             priority: priority,
@@ -51,11 +51,11 @@ class TaskListViewModel: ObservableObject {
         taskStore.addTask(newTask)
     }
     
-    func toggleTaskCompletion(_ task: Task) {
+    func toggleTaskCompletion(_ task: TaskItem) {
         taskStore.toggleTaskCompletion(task)
     }
     
-    func deleteTask(_ task: Task) {
+    func deleteTask(_ task: TaskItem) {
         taskStore.deleteTask(task)
     }
 }

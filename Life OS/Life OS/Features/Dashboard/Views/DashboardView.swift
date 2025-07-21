@@ -23,11 +23,11 @@ struct DashboardView: View {
         }
     }
     
-    private var todaysTasks: [Task] {
+    private var todaysTasks: [TaskItem] {
         dataManager.todaysTasks
     }
     
-    private var upcomingTasks: [Task] {
+    private var upcomingTasks: [TaskItem] {
         Array(dataManager.upcomingTasks.prefix(3))
     }
     
@@ -142,7 +142,7 @@ struct StatCard: View {
 }
 
 struct TaskCard: View {
-    let task: Task
+    let task: TaskItem
     let onToggle: () -> Void
     
     var body: some View {

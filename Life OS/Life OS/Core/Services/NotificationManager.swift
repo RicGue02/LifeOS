@@ -8,9 +8,10 @@
 import Foundation
 import UserNotifications
 import SwiftUI
+import Combine
 
 @MainActor
-class NotificationManager: ObservableObject {
+final class NotificationManager: ObservableObject {
     static let shared = NotificationManager()
     
     @Published var isAuthorized = false
@@ -27,7 +28,9 @@ class NotificationManager: ObservableObject {
             isAuthorized = granted
             
             if granted {
-                await UIApplication.shared.registerForRemoteNotifications()
+                await MainActor.run {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
             }
         } catch {
             print("Notification authorization error: \(error)")
@@ -35,14 +38,14 @@ class NotificationManager: ObservableObject {
     }
     
     private func checkAuthorizationStatus() {
-        Task {
+        _Concurrency.Task {
             let center = UNUserNotificationCenter.current()
             let settings = await center.notificationSettings()
             isAuthorized = settings.authorizationStatus == .authorized
         }
     }
     
-    func scheduleTaskReminder(for task: Task) async {
+    func scheduleTaskReminder(for task: TaskItem) async {
         guard isAuthorized,
               let dueDate = task.dueDate,
               dueDate > Date() else { return }
@@ -98,7 +101,7 @@ class NotificationManager: ObservableObject {
         }
     }
     
-    func cancelTaskReminder(for task: Task) {
+    func cancelTaskReminder(for task: TaskItem) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(
             withIdentifiers: ["task-\(task.id.uuidString)"]
         )

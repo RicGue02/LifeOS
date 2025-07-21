@@ -7,16 +7,15 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 @MainActor
-class DataManager: ObservableObject {
-    static let shared = DataManager()
-    
+final class DataManager: ObservableObject {
     @Published var taskStore: TaskStore
     @Published var habitStore: HabitStore
     let notificationManager = NotificationManager.shared
     
-    private init() {
+    init() {
         self.taskStore = TaskStore()
         self.habitStore = HabitStore()
         setupNotifications()
@@ -27,7 +26,7 @@ class DataManager: ObservableObject {
     }
     
     // Dashboard Statistics
-    var todaysTasks: [Task] {
+    var todaysTasks: [TaskItem] {
         taskStore.incompleteTasks.filter { task in
             if let dueDate = task.dueDate {
                 return Calendar.current.isDateInToday(dueDate)
@@ -36,7 +35,7 @@ class DataManager: ObservableObject {
         }
     }
     
-    var upcomingTasks: [Task] {
+    var upcomingTasks: [TaskItem] {
         taskStore.incompleteTasks
             .filter { $0.dueDate != nil }
             .sorted { ($0.dueDate ?? Date()) < ($1.dueDate ?? Date()) }

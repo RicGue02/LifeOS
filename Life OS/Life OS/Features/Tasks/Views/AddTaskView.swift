@@ -14,7 +14,7 @@ struct AddTaskView: View {
     
     @State private var title = ""
     @State private var description = ""
-    @State private var priority: Task.Priority = .medium
+    @State private var priority: TaskItem.Priority = .medium
     @State private var hasDueDate = false
     @State private var dueDate = Date()
     @State private var enableReminder = false
@@ -31,7 +31,7 @@ struct AddTaskView: View {
                 
                 Section("Settings") {
                     Picker("Priority", selection: $priority) {
-                        ForEach(Task.Priority.allCases, id: \.self) { priority in
+                        ForEach(TaskItem.Priority.allCases, id: \.self) { priority in
                             Label(priority.title, systemImage: "flag.fill")
                                 .foregroundColor(priority.color)
                                 .tag(priority)
@@ -69,7 +69,7 @@ struct AddTaskView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        let newTask = Task(
+                        let newTask = TaskItem(
                             title: title,
                             description: description,
                             priority: priority,
@@ -78,7 +78,7 @@ struct AddTaskView: View {
                         viewModel.taskStore.addTask(newTask)
                         
                         if enableReminder && hasDueDate {
-                            Task {
+                            _Concurrency.Task {
                                 await dataManager.notificationManager.scheduleTaskReminder(for: newTask)
                             }
                         }

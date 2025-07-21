@@ -105,7 +105,7 @@ struct StatsView: View {
                             .padding(.horizontal)
                         
                         HStack(spacing: 20) {
-                            ForEach(Task.Priority.allCases, id: \.self) { priority in
+                            ForEach(TaskItem.Priority.allCases, id: \.self) { priority in
                                 VStack(spacing: 8) {
                                     Text("\(taskCount(for: priority))")
                                         .font(.title2)
@@ -169,11 +169,11 @@ struct StatsView: View {
         return Int((Double(dataManager.taskStore.completedTasks.count) / Double(dataManager.taskStore.tasks.count)) * 100)
     }
     
-    private func taskCount(for priority: Task.Priority) -> Int {
+    private func taskCount(for priority: TaskItem.Priority) -> Int {
         dataManager.taskStore.tasks.filter { $0.priority == priority }.count
     }
     
-    private var recentTasks: [Task] {
+    private var recentTasks: [TaskItem] {
         dataManager.taskStore.tasks
             .sorted { $0.updatedAt > $1.updatedAt }
             .prefix(5)

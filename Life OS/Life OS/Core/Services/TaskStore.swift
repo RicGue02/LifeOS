@@ -10,7 +10,7 @@ import Combine
 
 @MainActor
 class TaskStore: ObservableObject {
-    @Published var tasks: [Task] = []
+    @Published var tasks: [TaskItem] = []
     
     private let userDefaults = UserDefaults.standard
     private let tasksKey = "com.lifeos.tasks"
@@ -19,12 +19,12 @@ class TaskStore: ObservableObject {
         loadTasks()
     }
     
-    func addTask(_ task: Task) {
+    func addTask(_ task: TaskItem) {
         tasks.append(task)
         saveTasks()
     }
     
-    func updateTask(_ task: Task) {
+    func updateTask(_ task: TaskItem) {
         if let index = tasks.firstIndex(where: { $0.id == task.id }) {
             var updatedTask = task
             updatedTask.updatedAt = Date()
@@ -33,12 +33,12 @@ class TaskStore: ObservableObject {
         }
     }
     
-    func deleteTask(_ task: Task) {
+    func deleteTask(_ task: TaskItem) {
         tasks.removeAll { $0.id == task.id }
         saveTasks()
     }
     
-    func toggleTaskCompletion(_ task: Task) {
+    func toggleTaskCompletion(_ task: TaskItem) {
         var updatedTask = task
         updatedTask.isCompleted.toggle()
         updateTask(updatedTask)
@@ -52,17 +52,17 @@ class TaskStore: ObservableObject {
     
     private func loadTasks() {
         if let data = userDefaults.data(forKey: tasksKey),
-           let decoded = try? JSONDecoder().decode([Task].self, from: data) {
+           let decoded = try? JSONDecoder().decode([TaskItem].self, from: data) {
             tasks = decoded
         }
     }
     
-    var incompleteTasks: [Task] {
+    var incompleteTasks: [TaskItem] {
         tasks.filter { !$0.isCompleted }
             .sorted { $0.priority.rawValue > $1.priority.rawValue }
     }
     
-    var completedTasks: [Task] {
+    var completedTasks: [TaskItem] {
         tasks.filter { $0.isCompleted }
             .sorted { $0.updatedAt > $1.updatedAt }
     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TaskRowView: View {
-    let task: Task
+    let task: TaskItem
     let onToggle: () -> Void
     
     var body: some View {

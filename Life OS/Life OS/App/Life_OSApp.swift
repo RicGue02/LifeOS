@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct Life_OSApp: App {
-    @StateObject private var dataManager = DataManager.shared
+    @StateObject private var dataManager = DataManager()
     
     var body: some Scene {
         WindowGroup {
