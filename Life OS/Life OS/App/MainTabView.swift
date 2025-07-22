@@ -30,15 +30,15 @@ struct MainTabView: View {
                 }
                 .tag(2)
             
-            HabitsView()
+            FinanceView()
                 .tabItem {
-                    Label("Habits", systemImage: "repeat.circle.fill")
+                    Label("Finance", systemImage: "dollarsign.circle.fill")
                 }
                 .tag(3)
             
-            StatsView()
+            HabitsView()
                 .tabItem {
-                    Label("Stats", systemImage: "chart.line.uptrend.xyaxis")
+                    Label("Habits", systemImage: "repeat.circle.fill")
                 }
                 .tag(4)
             

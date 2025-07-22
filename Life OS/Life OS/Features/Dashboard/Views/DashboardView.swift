@@ -85,6 +85,26 @@ struct DashboardView: View {
                     }
                     .padding(.horizontal)
                     
+                    // Finance Summary
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionHeader(title: "Finance Overview", systemImage: "dollarsign.circle")
+                        
+                        HStack(spacing: 16) {
+                            FinanceCard(
+                                title: "Balance",
+                                value: String(format: "$%.0f", dataManager.financeStore.currentBalance),
+                                trend: dataManager.financeStore.savingsRate > 0 ? .up : .down
+                            )
+                            
+                            FinanceCard(
+                                title: "This Month",
+                                value: String(format: "$%.0f", dataManager.financeStore.monthlyIncome - dataManager.financeStore.monthlyExpenses),
+                                trend: dataManager.financeStore.monthlyIncome > dataManager.financeStore.monthlyExpenses ? .up : .down
+                            )
+                        }
+                    }
+                    .padding(.horizontal)
+                    
                     // Today's Tasks
                     if !todaysTasks.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
@@ -214,5 +234,55 @@ struct SectionHeader: View {
                 .font(.headline)
             Spacer()
         }
+    }
+}
+
+struct FinanceCard: View {
+    let title: String
+    let value: String
+    let trend: Trend
+    
+    enum Trend {
+        case up, down, neutral
+        
+        var icon: String {
+            switch self {
+            case .up: return "arrow.up.circle.fill"
+            case .down: return "arrow.down.circle.fill"
+            case .neutral: return "minus.circle.fill"
+            }
+        }
+        
+        var color: Color {
+            switch self {
+            case .up: return .green
+            case .down: return .red
+            case .neutral: return .gray
+            }
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                Image(systemName: trend.icon)
+                    .font(.caption)
+                    .foregroundColor(trend.color)
+            }
+            
+            Text(value)
+                .font(.title3)
+                .fontWeight(.semibold)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
     }
 }

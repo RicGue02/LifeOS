@@ -14,12 +14,14 @@ final class DataManager: ObservableObject {
     @Published var taskStore: TaskStore
     @Published var habitStore: HabitStore
     @Published var characterStore: CharacterStore
+    @Published var financeStore: FinanceStore
     let notificationManager = NotificationManager.shared
     
     init() {
         self.taskStore = TaskStore()
         self.habitStore = HabitStore()
         self.characterStore = CharacterStore()
+        self.financeStore = FinanceStore()
         setupNotifications()
         setupCharacterTracking()
     }
