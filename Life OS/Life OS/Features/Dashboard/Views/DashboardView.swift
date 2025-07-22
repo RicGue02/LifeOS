@@ -11,18 +11,6 @@ struct DashboardView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var currentDate = Date()
     
-    private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: currentDate)
-        switch hour {
-        case 0..<12:
-            return "Good Morning"
-        case 12..<17:
-            return "Good Afternoon"
-        default:
-            return "Good Evening"
-        }
-    }
-    
     private var todaysTasks: [TaskItem] {
         dataManager.todaysTasks
     }
@@ -35,53 +23,78 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(greeting)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+                    // Weather and Motivation Widgets
+                    HStack(spacing: 12) {
+                        WeatherWidget()
+                            .frame(maxWidth: .infinity)
                         
-                        Text(currentDate.formatted(date: .complete, time: .omitted))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
+                        MotivationWidget()
+                            .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
                     
-                    // Character Progress
+                    // Daily Progress Widget
+                    DailyProgressWidget()
+                        .padding(.horizontal)
+                    
+                    // Character and Stats
                     HStack(spacing: 16) {
-                        // Mini Hexagon
-                        VStack {
+                        // Character Card
+                        VStack(spacing: 12) {
                             MiniHexagonView(
                                 dimensions: dataManager.characterStore.character.dimensions,
-                                size: 100
+                                size: 80
                             )
                             
-                            Text("Level \(dataManager.characterStore.character.level)")
-                                .font(.caption)
-                                .fontWeight(.medium)
+                            VStack(spacing: 4) {
+                                Text("Character")
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                Text("Level \(dataManager.characterStore.character.level)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(12)
                         
-                        // Quick Stats
-                        VStack(spacing: 16) {
-                            StatCard(
-                                title: "Tasks Today",
-                                value: "\(todaysTasks.count)",
-                                icon: "checklist",
-                                color: .blue
-                            )
+                        // Quick Stats Grid
+                        VStack(spacing: 12) {
+                            HStack(spacing: 12) {
+                                MiniStatCard(
+                                    value: "\(todaysTasks.count)",
+                                    label: "Tasks",
+                                    icon: "checklist",
+                                    color: .blue
+                                )
+                                
+                                MiniStatCard(
+                                    value: "\(dataManager.taskStore.completedTasks.count)",
+                                    label: "Done",
+                                    icon: "checkmark.circle.fill",
+                                    color: .green
+                                )
+                            }
                             
-                            StatCard(
-                                title: "Completed",
-                                value: "\(dataManager.taskStore.completedTasks.count)",
-                                icon: "checkmark.circle.fill",
-                                color: .green
-                            )
+                            HStack(spacing: 12) {
+                                MiniStatCard(
+                                    value: "\(dataManager.habitStore.habits.count)",
+                                    label: "Habits",
+                                    icon: "repeat",
+                                    color: .orange
+                                )
+                                
+                                MiniStatCard(
+                                    value: String(format: "%.0f%%", dataManager.financeStore.savingsRate * 100),
+                                    label: "Savings",
+                                    icon: "percent",
+                                    color: .purple
+                                )
+                            }
                         }
+                        .frame(maxWidth: .infinity)
                     }
                     .padding(.horizontal)
                     
@@ -282,6 +295,34 @@ struct FinanceCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
+}
+
+struct MiniStatCard: View {
+    let value: String
+    let label: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundColor(color)
+            
+            Text(value)
+                .font(.title3)
+                .fontWeight(.bold)
+            
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 8)
         .background(Color(.systemGray6))
         .cornerRadius(10)
     }

@@ -89,7 +89,7 @@ struct LifeDimensions: Codable {
 }
 
 struct Dimension: Codable, Identifiable {
-    let id = UUID()
+    var id = UUID()
     let name: String
     let icon: String
     let colorName: String

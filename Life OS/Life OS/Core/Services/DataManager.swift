@@ -15,6 +15,7 @@ final class DataManager: ObservableObject {
     @Published var habitStore: HabitStore
     @Published var characterStore: CharacterStore
     @Published var financeStore: FinanceStore
+    @Published var dailyStore: DailyStore
     let notificationManager = NotificationManager.shared
     
     init() {
@@ -22,6 +23,7 @@ final class DataManager: ObservableObject {
         self.habitStore = HabitStore()
         self.characterStore = CharacterStore()
         self.financeStore = FinanceStore()
+        self.dailyStore = DailyStore()
         setupNotifications()
         setupCharacterTracking()
     }
